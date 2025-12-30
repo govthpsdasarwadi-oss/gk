@@ -247,31 +247,6 @@ async function checkRollNumber() {
     startBtn.disabled = !snap.empty ? true : false; // disable if already attempted
 }
 
-    
-    async function startQuiz() {
-    const name = document.getElementById('sName').value.trim();
-    const pName = document.getElementById('pName').value.trim();
-    const cls = document.getElementById('studentClass').value;
-    const roll = document.getElementById('studentrollnumber').value.trim();
-    
-    if(!name || !pName || !cls || !roll) return alert("Fill all details!");
-
-    // ✅ DEVICE-INDEPENDENT BLOCK
-    const snap = await db.collection("mathResults")
-                         .where("roll", "==", roll)
-                         .where("class", "==", cls)
-                         .get();
-    if(!snap.empty){
-        alert("⚠ Already Attempted! You cannot start the quiz again.");
-        return; // stop quiz start
-    }
-
-    // …rest of startQuiz() continues here
-}
-
-    
-    
-
     // 2. SECRET DOOR LOGIC
     let clicks = 0;
     let clickTimeout;
@@ -387,29 +362,34 @@ async function submitQuiz() {
     let score = 0;
 
     questions.forEach((item, i) => {
-        if (
-  document.querySelector(`input[name="q${i}"]:checked`)?.value === item.a
-)
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        if (selected) {
+            const selectedIndex = item.options.indexOf(selected.value);
+            if (selectedIndex === item.a) {
+                score++;
+            }
+        }
+    });
 
-
-    // Save to Firebase
+    // ✅ Save to Firestore
     await db.collection("mathResults").add({
         name: document.getElementById('sName').value.toUpperCase(),
         father: document.getElementById('pName').value.toUpperCase(),
         class: document.getElementById('studentClass').value,
         roll: document.getElementById('studentrollnumber').value,
         score: score,
+        total: questions.length,
         timestamp: new Date()
     });
 
-    // Show Thank You page
+    // ✅ Show Thank You Page
     document.getElementById('quizPage').classList.add('hidden');
     document.getElementById('thankYouPage').classList.remove('hidden');
 
-    // Show student name (NO score)
     document.getElementById('finalName').innerText =
         "ವಿದ್ಯಾರ್ಥಿ ಹೆಸರು: " + document.getElementById('sName').value;
 }
+
 
     // 5. ADMIN UTILITIES
     async function loadLeaderboard() {
@@ -486,6 +466,7 @@ async function submitQuiz() {
 </body>
 
 </html>
+
 
 
 
