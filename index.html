@@ -388,11 +388,9 @@ async function submitQuiz() {
 
     questions.forEach((item, i) => {
         if (
-            document.querySelector(`input[name="q${i}"]:checked`)?.value === item.a
-        ) {
-            score++;
-        }
-    });
+  document.querySelector(`input[name="q${i}"]:checked`)?.value === item.a
+)
+
 
     // Save to Firebase
     await db.collection("mathResults").add({
@@ -488,6 +486,7 @@ async function submitQuiz() {
 </body>
 
 </html>
+
 
 
 
